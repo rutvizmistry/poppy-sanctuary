@@ -166,7 +166,7 @@
                   <span class="status-pill gold-pill">Fresh thought</span>
                 </div>
                 <blockquote class="wisdom-quote" id="wisdomQuoteText">
-                  “A father’s wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned, Poppy.”
+                  “Poppy's wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned, Poppy.”
                 </blockquote>
                 <div class="wisdom-footer">
                   <span class="wisdom-author" id="wisdomAuthor">— Dedicated with love</span>
@@ -351,6 +351,42 @@
                 </div>
               </article>
 
+              
+              <!-- MOMENTS & MEMORIES (Poppy's Keepsakes) -->
+              <article class="card keepsakes-card" id="poppyKeepsakesCard">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow gold">MOMENTS &amp; MEMORIES</p>
+                    <h2>Poppy's Keepsakes</h2>
+                    <p class="heading-subtitle">A peaceful space to note memories, recipes, and personal thoughts that you cherish.</p>
+                  </div>
+                  <span class="permission-note"><svg><use href="#i-lock"/></svg> Only you</span>
+                </div>
+                <div class="keepsakes-list">
+                  <div class="keepsake-item" tabindex="0" role="button" data-action="open-keepsake-note" data-note-title="The Lemon Verbena &amp; Mint">
+                    <span class="keepsake-emoji">🌱</span>
+                    <div class="keepsake-info">
+                      <strong>The Lemon Verbena &amp; Mint</strong>
+                      <p>Thriving well by the sunny kitchen window.</p>
+                    </div>
+                  </div>
+                  <div class="keepsake-item" tabindex="0" role="button" data-action="open-keepsake-note" data-note-title="Sunday Lemon Rice">
+                    <span class="keepsake-emoji">🍋</span>
+                    <div class="keepsake-info">
+                      <strong>Sunday Lemon Rice</strong>
+                      <p>Arjun's recipe with mustard seeds and curry leaves.</p>
+                    </div>
+                  </div>
+                  <div class="keepsake-item" tabindex="0" role="button" data-action="open-keepsake-note" data-note-title="Old Family Photo Album">
+                    <span class="keepsake-emoji">📷</span>
+                    <div class="keepsake-info">
+                      <strong>Old Family Photo Album</strong>
+                      <p>Ria found the 1988 summer trip snapshots.</p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
               <!-- Reflection Card (Saves by itself continuously) -->
               <article class="card reflection-card">
                 <div class="card-head">
@@ -497,8 +533,13 @@
             <label>Time<input name="time" type="time" value="10:00" /></label>
           </div>
           <label>Start in
-            <select name="list">
-              <option value="todo">To do</option>
+            <div class="task-status-selector" id="taskStatusSelector" role="radiogroup" aria-label="Start in status">
+              <button type="button" class="status-choice active" data-status="todo">To do</button>
+              <button type="button" class="status-choice" data-status="progress">In progress</button>
+              <button type="button" class="status-choice" data-status="done">Done</button>
+            </div>
+            <select name="list" id="taskModalListSelect" class="sr-only" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;">
+              <option value="todo" selected>To do</option>
               <option value="progress">In progress</option>
               <option value="done">Done</option>
             </select>

@@ -43,7 +43,7 @@ const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector
 const icons = { check: '<svg><use href="#i-check"/></svg>' };
 
 const poppyWisdomQuotes = [
-  { text: "“A father’s wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned, Poppy.”", author: "— Dedicated with love" },
+  { text: "“Poppy's wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned, Poppy.”", author: "— Dedicated with love" },
   { text: "“The best days begin with a quiet cup of tea, clean morning air, and the peace of knowing you are cherished.”", author: "— Morning thought" },
   { text: "“To plant a garden is to believe in tomorrow. Tend to your quiet routines and let contentment grow around you.”", author: "— Nature and tranquility" },
   { text: "“You don’t have to rush through the day, Poppy. One gentle priority at a time is the secret to a restful life.”", author: "— Gentle reminder" },
@@ -414,12 +414,15 @@ function renderCalendar() {
 }
 
 const defaultVaultNotes = [
-  { icon: "🌱", title: "Garden notes", text: "Planting ideas, seasonal reminders, and the things that are thriving.", meta: "12 notes", color: "gold" },
-  { icon: "🍋", title: "Recipes to keep", text: "Simple, generous food for Sundays and the people around the table.", meta: "8 notes", color: "green" },
+  { icon: "🌱", title: "The Lemon Verbena & Mint", text: "Thriving well by the sunny kitchen window. Fresh mint and lemon verbena love morning sun.", meta: "Keepsake · Cherished memory", color: "green" },
+  { icon: "🍋", title: "Sunday Lemon Rice", text: "Arjun's recipe with mustard seeds and curry leaves. Gently temper mustard seeds, roasted cashews, and fresh curry leaves in ghee before folding into fluffy rice.", meta: "Keepsake · Family recipe", color: "gold" },
+  { icon: "📷", title: "Old Family Photo Album", text: "Ria found the 1988 summer trip snapshots. Warm laughter, sunny days, and cherished memories.", meta: "Keepsake · Photo memory", color: "blue" },
+  { icon: "🌱", title: "Garden notes", text: "Planting ideas, seasonal reminders, and the things that are thriving.", meta: "12 notes", color: "green" },
+  { icon: "📖", title: "Recipes to keep", text: "Simple, generous food for Sundays and the people around the table.", meta: "8 notes", color: "gold" },
   { icon: "🗺️", title: "Places to go", text: "Small trips, long weekends, and places worth taking your time in.", meta: "5 notes", color: "blue" },
-  { icon: "📚", title: "Things to learn", text: "Questions, references, and rabbit holes for a curious afternoon.", meta: "21 notes", color: "rose" },
-  { icon: "🧰", title: "Home projects", text: "Practical ideas for making the house a little more yours.", meta: "9 notes", color: "gold" },
-  { icon: "✦", title: "Saved thoughts", text: "Calm ideas, reflections, and reminders ready whenever you need them.", meta: "4 notes", color: "blue" }
+  { icon: "💡", title: "Things to learn", text: "Questions, references, and rabbit holes for a curious afternoon.", meta: "21 notes", color: "rose" },
+  { icon: "🏡", title: "Home projects", text: "Practical ideas for making the house a little more yours.", meta: "9 notes", color: "gold" },
+  { icon: "✍️", title: "Saved thoughts", text: "Calm ideas, reflections, and reminders ready whenever you need them.", meta: "4 notes", color: "blue" }
 ];
 
 function getVaultStoredNotes() {
@@ -783,6 +786,26 @@ function openVaultDetails(card) {
   $("#vaultModalTitle").textContent = title;
   $("#vaultModalMeta").textContent = meta;
   $("#vaultDetailText").value = summary;
+  noteRedoStrokes = [];
+  openModal("#vaultModal");
+  requestAnimationFrame(() => {
+    resizeVaultCanvas();
+    const canvas = $("#vaultDrawCanvas");
+    if (!canvas) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem("hearth-harbor-vault-annotations") || "{}")[activeVaultTitle];
+      currentNoteStrokes = Array.isArray(saved?.strokes) ? saved.strokes : [];
+      redrawVaultCanvas();
+    } catch { currentNoteStrokes = []; }
+    updateNoteUndoRedoUI();
+  });
+}
+
+function openVaultNoteDirect(title, text, meta = "Keepsake · Cherished memory") {
+  activeVaultTitle = title;
+  $("#vaultModalTitle").textContent = title;
+  $("#vaultModalMeta").textContent = meta;
+  $("#vaultDetailText").value = text || "";
   noteRedoStrokes = [];
   openModal("#vaultModal");
   requestAnimationFrame(() => {
@@ -1183,6 +1206,32 @@ function autosaveReflection() {
    GLOBAL EVENT ROUTER
    ======================================================== */
 document.addEventListener("click", event => {
+  // Task status choice pill click (Segmented Task Status)
+  const statusBtn = event.target.closest(".status-choice");
+  if (statusBtn) {
+    const parent = statusBtn.closest(".task-status-selector");
+    if (parent) {
+      parent.querySelectorAll(".status-choice").forEach(b => b.classList.remove("active"));
+      statusBtn.classList.add("active");
+      const status = statusBtn.dataset.status;
+      const select = $("#taskList") || $("#taskModalListSelect") || parent.parentElement.querySelector("select[name='list']");
+      if (select) select.value = status;
+    }
+    return;
+  }
+
+  // Open keepsake note click (Moments & Memories)
+  const keepsakeItem = event.target.closest("[data-action='open-keepsake-note']");
+  if (keepsakeItem) {
+    const noteTitle = keepsakeItem.dataset.noteTitle;
+    const notes = loadVaultNotes();
+    let match = notes.find(n => n.title.toLowerCase() === noteTitle.toLowerCase()) ||
+                defaultVaultNotes.find(n => n.title.toLowerCase() === noteTitle.toLowerCase());
+    if (match) {
+      openVaultNoteDirect(match.title, match.text, match.meta);
+    }
+    return;
+  }
   if (event.target.closest(".notification-button")) {
     showToast("All clear. Your personal space is calm and up to date.");
     return;
