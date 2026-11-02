@@ -241,7 +241,9 @@ function greetingForNow() {
    RENDERERS: WEEK, TASKS, CALENDAR & VAULT
    ======================================================== */
 function renderWeekProgress() {
-  const dashboardDate = new Date("2026-10-30T12:00:00");
+  const footer = $(".progress-footer strong");
+  if (!footer) return;
+  const dashboardDate = new Date();
   const monday = new Date(dashboardDate);
   monday.setDate(dashboardDate.getDate() - ((dashboardDate.getDay() + 6) % 7));
   let completedThisWeek = 0;
@@ -256,7 +258,7 @@ function renderWeekProgress() {
     if (bar) bar.style.height = `${dayTasks.length ? Math.round((completed / dayTasks.length) * 100) : 0}%`;
     column.classList.toggle("current", date === getLocalDateStr());
   });
-  $(".progress-footer strong").textContent = `${completedThisWeek} this week`;
+  footer.textContent = `${completedThisWeek} this week`;
 }
 
 function renderTasks() {
@@ -895,8 +897,8 @@ function handleCompanionInput(userText) {
         switchView("planner");
         state.plannerView = "calendar";
         saveState();
-        $("[data-planner-view]").forEach(tab => tab.classList.toggle("active", tab.dataset.plannerView === "calendar"));
-        $("#planner-agenda, #planner-calendar, #planner-tasks, #planner-kanban").forEach(panel => panel.classList.add("hidden"));
+        $$("[data-planner-view]").forEach(tab => tab.classList.toggle("active", tab.dataset.plannerView === "calendar"));
+        $$("#planner-agenda, #planner-calendar, #planner-tasks, #planner-kanban").forEach(panel => panel.classList.add("hidden"));
         $("#planner-calendar")?.classList.remove("hidden");
         renderCalendar();
       }, 600);
