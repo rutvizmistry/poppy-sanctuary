@@ -44,6 +44,7 @@
       <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
       <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
       <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></symbol>
     </svg>
 
     <div class="app-shell">
@@ -98,8 +99,8 @@
             </div>
             <button class="icon-button notification-button" data-action="show-notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span></span></button>
             <div class="topbar-divider"></div>
-            <div class="avatar avatar-gold"><img src="profile.jpg" alt="Poppy" class="avatar-profile-img" /></div>
-            <div class="topbar-user"><strong>Poppy</strong><span>Good day</span></div>
+            <div class="avatar avatar-gold" role="button" tabindex="0" data-view-target="personal" title="Personal Space & Theme Settings"><img src="profile.jpg" alt="Poppy" class="avatar-profile-img" /></div>
+            <div class="topbar-user" role="button" tabindex="0" data-view-target="personal" title="Personal Space & Theme Settings"><strong>Poppy</strong><span>Good day</span></div>
           </div>
         </header>
 
@@ -245,7 +246,10 @@
           <section class="page-view" id="view-vault">
             <div class="page-heading">
               <div><p class="eyebrow">A home for what you’ve learned</p><h1>Knowledge Vault</h1><p class="heading-subtitle">Your notes, references, and useful discoveries—kept close.</p></div>
-              <button class="button button-primary" data-action="add-note"><svg><use href="#i-plus"/></svg>New note</button>
+              <div class="vault-heading-actions">
+                <button type="button" class="button button-ghost small" data-action="reset-vault-default" title="Restore original default notes (Garden notes, Things to learn, etc.)">↺ Reset to defaults</button>
+                <button type="button" class="button button-primary" data-action="add-note"><svg><use href="#i-plus"/></svg>New note</button>
+              </div>
             </div>
             <div class="vault-search"><svg><use href="#i-search"/></svg><input id="vaultSearch" type="search" placeholder="Search your vault..." /><kbd>⌘ K</kbd></div>
             <div class="vault-grid" id="vaultGrid"></div>
@@ -281,9 +285,8 @@
                 </div>
                 <!-- Conversation Messages -->
                 <div class="companion-messages" id="companionMessages" role="log" aria-live="polite"></div>
-                <!-- Message Compose Input with Paste Button -->
+                <!-- Message Compose Input -->
                 <form class="companion-compose-bar" id="companionForm">
-                  <button type="button" class="companion-paste-btn" id="companionPasteBtn" title="Paste copied text directly" aria-label="Paste text">📋 Paste</button>
                   <input type="text" id="companionInput" name="message" required autocomplete="off" placeholder="Chat with companion, ask anything, or note tasks..." />
                   <button type="submit" class="button button-gold" aria-label="Send message">Send <svg><use href="#i-send"/></svg></button>
                 </form>
@@ -291,13 +294,64 @@
             </div>
           </section>
 
-          <!-- PERSONAL SPACE (CLEAN & EXPANSIVE REFLECTION) -->
+          <!-- PERSONAL SPACE (CLEAN & EXPANSIVE REFLECTION + SANCTUARY PERSONALIZATION) -->
           <section class="page-view" id="view-personal">
             <div class="page-heading">
-              <div><p class="eyebrow">A space that is only yours</p><h1>Personal Space</h1><p class="heading-subtitle">Private reflections, quiet thoughts, and things you want to remember.</p></div>
-              <button class="button button-primary" data-action="focus-reflection"><svg><use href="#i-plus"/></svg>New reflection</button>
+              <div><p class="eyebrow">A space that is only yours</p><h1>Personal Space & Settings</h1><p class="heading-subtitle">Customize theme colours, your greeting name, and write private reflections.</p></div>
+              <button class="button button-primary" data-action="focus-reflection"><svg><use href="#i-plus"/></svg>Write reflection</button>
             </div>
             <div class="personal-grid single-column">
+              <!-- Personalize Sanctuary (Available directly on Phone & Desktop) -->
+              <article class="card personalization-card" id="personalizationCard">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow gold">Personalize Sanctuary</p>
+                    <h2>Theme Colours & Greeting Name</h2>
+                    <p class="heading-subtitle">Choose your favorite soothing colour and name for Poppy's app.</p>
+                  </div>
+                </div>
+                <div class="personalize-form">
+                  <div class="personalize-row">
+                    <label for="personalGreetingName"><strong>Greeting Name</strong><span>How the sanctuary greets you every day:</span></label>
+                    <div class="name-input-group">
+                      <input type="text" id="personalGreetingName" value="Poppy" placeholder="e.g. Poppy" />
+                      <button type="button" class="button button-gold small" id="savePersonalNameBtn">Update Name</button>
+                    </div>
+                  </div>
+                  <div class="personalize-row">
+                    <label><strong>Sanctuary Theme Colour</strong><span>Tap any color to transform the entire app live:</span></label>
+                    <div class="mobile-theme-swatches" role="radiogroup" aria-label="Theme colours">
+                      <button type="button" class="theme-swatch-pill active" data-theme-color="gold" title="Amber Gold">
+                        <span class="swatch-circle gold"></span> Gold
+                      </button>
+                      <button type="button" class="theme-swatch-pill" data-theme-color="emerald" title="Emerald Sage">
+                        <span class="swatch-circle emerald"></span> Emerald
+                      </button>
+                      <button type="button" class="theme-swatch-pill" data-theme-color="ocean" title="Ocean Navy">
+                        <span class="swatch-circle ocean"></span> Navy
+                      </button>
+                      <button type="button" class="theme-swatch-pill" data-theme-color="rose" title="Rose Bloom">
+                        <span class="swatch-circle rose"></span> Rose
+                      </button>
+                      <button type="button" class="theme-swatch-pill" data-theme-color="amethyst" title="Royal Amethyst">
+                        <span class="swatch-circle amethyst"></span> Violet
+                      </button>
+                      <button type="button" class="theme-swatch-pill" data-theme-color="copper" title="Sunset Copper">
+                        <span class="swatch-circle copper"></span> Copper
+                      </button>
+                    </div>
+                  </div>
+                  <div class="personalize-row toggle-row">
+                    <div>
+                      <strong>Large Comfortable Text</strong>
+                      <span>Larger relaxed font size for easier reading</span>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="mobileTextComfortToggle" /><i></i></label>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Reflection Card (Saves by itself continuously) -->
               <article class="card reflection-card">
                 <div class="card-head">
                   <div>
@@ -305,7 +359,7 @@
                     <h2>What brought peace today?</h2>
                   </div>
                   <div class="autosave-badge" id="reflectionAutosaveStatus">
-                    <span class="autosave-dot"></span> Saved
+                    <span class="autosave-dot"></span> Autosaved
                   </div>
                 </div>
                 <div class="reflection-prompts">
@@ -317,7 +371,7 @@
                 <textarea id="reflectionText" rows="10" placeholder="A thought, a moment, or something you want to carry forward in your heart..."></textarea>
                 <div class="reflection-footer">
                   <span id="reflectionWordCount">0 words</span>
-                  <button class="button button-gold" data-action="save-reflection">Save reflection</button>
+                  <span class="autosave-quiet-hint"><svg><use href="#i-check"/></svg> Autosaved continuously on this device</span>
                 </div>
               </article>
             </div>
@@ -485,7 +539,7 @@
     <!-- Vault Detail & Annotator Modal (With Same Curved Undo/Redo & Autosave) -->
     <div class="modal-backdrop hidden" id="vaultModal">
       <div class="modal detail-modal vault-detail-modal" role="dialog" aria-modal="true" aria-labelledby="vaultModalTitle">
-        <button class="modal-close icon-button" data-action="close-vault-modal" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+        <button class="modal-close-btn" data-action="close-vault-modal" aria-label="Close note">✕ Close</button>
         <div class="modal-header-row">
           <div>
             <p class="eyebrow gold">Knowledge Vault · Annotate</p>
@@ -515,6 +569,19 @@
           <button type="button" class="note-tool" data-note-tool="highlight">▰<span>Highlight</span></button>
           <button type="button" class="note-tool" data-note-tool="eraser">⌫<span>Eraser</span></button>
           <span class="note-tool-divider"></span>
+          <!-- Thickness Selector for Pen / Highlighter / Eraser -->
+          <div class="note-thickness-picker" role="group" aria-label="Tool thickness">
+            <button type="button" class="thickness-btn active" data-note-thickness="fine" title="Fine (Thin tip)">
+              <span class="thick-sample fine"></span><span>Thin</span>
+            </button>
+            <button type="button" class="thickness-btn" data-note-thickness="medium" title="Medium tip">
+              <span class="thick-sample medium"></span><span>Med</span>
+            </button>
+            <button type="button" class="thickness-btn" data-note-thickness="thick" title="Thick / Broad tip">
+              <span class="thick-sample thick"></span><span>Thick</span>
+            </button>
+          </div>
+          <span class="note-tool-divider"></span>
           <!-- Inks Palette -->
           <button type="button" class="note-color active" data-note-color="gold" aria-label="Amber Gold ink"></button>
           <button type="button" class="note-color emerald" data-note-color="emerald" aria-label="Emerald Sage ink"></button>
@@ -533,8 +600,9 @@
         </div>
 
         <div class="permission-note"><svg><use href="#i-lock"/></svg> Changes are autosaved privately on this device</div>
-        <div class="form-actions">
-          <button type="button" class="button button-gold" data-action="close-vault-modal">Done</button>
+        <div class="form-actions vault-modal-actions">
+          <button type="button" class="button button-danger-ghost" id="deleteCurrentVaultNoteBtn" data-action="delete-active-vault-note"><svg><use href="#i-trash"/></svg> Delete note</button>
+          <button type="button" class="button button-gold" data-action="close-vault-modal">Done / Save</button>
         </div>
       </div>
     </div>
@@ -542,7 +610,7 @@
     <!-- Note Modal (Add note) -->
     <div class="modal-backdrop hidden" id="noteModal">
       <div class="modal note-modal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
-        <button class="modal-close icon-button" data-action="close-note-modal" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+        <button class="modal-close-btn" data-action="close-note-modal" aria-label="Close">✕ Close</button>
         <p class="eyebrow gold">Knowledge Vault</p>
         <h2 id="noteModalTitle">Add a new note</h2>
         <p class="modal-subtitle">Keep your thoughts, references, and discoveries organized.</p>

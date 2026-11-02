@@ -1,4 +1,4 @@
-const CACHE_NAME = "hearth-harbor-v5";
+const CACHE_NAME = "hearth-harbor-v6";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",

@@ -104,6 +104,9 @@ function applyTheme(theme) {
   $$(".theme-card-option").forEach(card => {
     card.classList.toggle("active", card.dataset.themeColor === state.colorTheme);
   });
+  $$(".theme-swatch-pill").forEach(pill => {
+    pill.classList.toggle("active", pill.dataset.themeColor === state.colorTheme);
+  });
   saveState();
 }
 
@@ -112,6 +115,8 @@ function applyTextComfort(enabled) {
   document.body.classList.toggle("comfortable-text", state.comfortableText);
   const toggle = $("#comfortableTextToggle");
   if (toggle) toggle.checked = state.comfortableText;
+  const mobileToggle = $("#mobileTextComfortToggle");
+  if (mobileToggle) mobileToggle.checked = state.comfortableText;
   saveState();
 }
 
@@ -417,9 +422,20 @@ const defaultVaultNotes = [
   { icon: "✦", title: "Saved thoughts", text: "Calm ideas, reflections, and reminders ready whenever you need them.", meta: "4 notes", color: "blue" }
 ];
 
+function getVaultStoredNotes() {
+  try {
+    const raw = localStorage.getItem("hearth-harbor-vault-notes");
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(defaultVaultNotes));
+    return [...defaultVaultNotes];
+  } catch {
+    return [...defaultVaultNotes];
+  }
+}
+
 function loadVaultNotes() {
   try {
-    const notes = [...defaultVaultNotes, ...(JSON.parse(localStorage.getItem("hearth-harbor-vault-notes") || "[]"))];
+    const notes = getVaultStoredNotes();
     const annotations = JSON.parse(localStorage.getItem("hearth-harbor-vault-annotations") || "{}");
     return notes.map(note => annotations[note.title]?.text ? { ...note, text: annotations[note.title].text } : note);
   }
@@ -428,9 +444,27 @@ function loadVaultNotes() {
 
 function saveVaultNote(note) {
   try {
-    const customNotes = JSON.parse(localStorage.getItem("hearth-harbor-vault-notes") || "[]");
-    customNotes.push(note);
-    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(customNotes));
+    const notes = getVaultStoredNotes();
+    notes.unshift(note);
+    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(notes));
+  } catch {}
+}
+
+function deleteVaultNote(title) {
+  try {
+    let notes = getVaultStoredNotes();
+    notes = notes.filter(n => n.title !== title);
+    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(notes));
+    const annotations = JSON.parse(localStorage.getItem("hearth-harbor-vault-annotations") || "{}");
+    delete annotations[title];
+    localStorage.setItem("hearth-harbor-vault-annotations", JSON.stringify(annotations));
+  } catch {}
+}
+
+function resetVaultNotesToDefault() {
+  try {
+    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(defaultVaultNotes));
+    localStorage.removeItem("hearth-harbor-vault-annotations");
   } catch {}
 }
 
@@ -443,7 +477,20 @@ function renderVault(search = "") {
     const icon = escapeHtml(note.icon || "📝");
     const meta = escapeHtml(note.meta || "Private note");
     const colorClass = ({ gold: "gold", green: "green", blue: "blue", rose: "rose", purple: "purple" })[note.color] || "blue";
-    return `<article class="vault-card note-card ${colorClass}" tabindex="0" role="button" aria-label="Open ${title}"><div class="note-preview"><span class="note-label">PRIVATE NOTE</span><div class="note-card-icon">${icon}</div><h3>${title}</h3><p>${text}</p><span class="note-card-prompt">Open to annotate →</span></div><div class="vault-meta"><span>${meta}</span><strong>Open note →</strong></div></article>`;
+    return `<article class="vault-card note-card ${colorClass}" tabindex="0" role="button" aria-label="Open ${title}">
+      <button type="button" class="note-delete-btn" data-action="delete-vault-note" data-note-title="${title}" aria-label="Delete note" title="Delete note">🗑️</button>
+      <div class="note-preview">
+        <span class="note-label">PRIVATE NOTE</span>
+        <div class="note-card-icon">${icon}</div>
+        <h3>${title}</h3>
+        <p>${text}</p>
+        <span class="note-card-prompt">Open to annotate →</span>
+      </div>
+      <div class="vault-meta">
+        <span>${meta}</span>
+        <strong>Open note →</strong>
+      </div>
+    </article>`;
   }).join("") : `<div class="card" style="grid-column:1/-1"><p class="heading-subtitle">No notes match that search yet.</p></div>`;
 }
 
@@ -480,6 +527,10 @@ function updateNameUI(name) {
   if (topbarGreeting) topbarGreeting.textContent = greeting;
   const profileChip = $(".profile-chip strong");
   if (profileChip) profileChip.textContent = displayName;
+  const personalInput = $("#personalGreetingName");
+  if (personalInput && document.activeElement !== personalInput) {
+    personalInput.value = displayName;
+  }
   $$(".avatar-gold").forEach(av => {
     if (!av.querySelector("img")) {
       av.innerHTML = '<img src="profile.jpg" alt="Poppy" class="avatar-profile-img" />';
@@ -504,9 +555,27 @@ let wasDragged = false;
 let activeVaultTitle = "";
 let selectedNoteTool = "select";
 let selectedNoteColor = "#e2a84a";
+let selectedNoteThickness = "fine"; // "fine" | "medium" | "thick"
 let currentNoteStrokes = [];
 let noteRedoStrokes = [];
 let autosaveTimer = null;
+
+function getNoteStrokeWidth(tool, thickness) {
+  if (tool === "eraser") {
+    if (thickness === "thick") return 48;
+    if (thickness === "medium") return 26;
+    return 14;
+  }
+  if (tool === "highlight") {
+    if (thickness === "thick") return 28;
+    if (thickness === "medium") return 18;
+    return 12;
+  }
+  // pen
+  if (thickness === "thick") return 9;
+  if (thickness === "medium") return 5;
+  return 2;
+}
 
 const noteColorMap = {
   gold: "#e2a84a",
@@ -558,7 +627,7 @@ function redrawVaultCanvas() {
     context.globalCompositeOperation = stroke.tool === "eraser" ? "destination-out" : "source-over";
     context.strokeStyle = stroke.color;
     context.globalAlpha = stroke.tool === "highlight" ? 0.35 : 1;
-    context.lineWidth = stroke.width || (stroke.tool === "highlight" ? 14 : 3);
+    context.lineWidth = stroke.width || (stroke.tool === "eraser" ? 26 : stroke.tool === "highlight" ? 16 : 3);
     context.lineCap = "round";
     context.lineJoin = "round";
     context.beginPath();
@@ -649,10 +718,11 @@ function setupVaultDrawing() {
   canvas.addEventListener("pointerdown", event => {
     drawing = true;
     const pt = point(event);
+    const strokeWidth = getNoteStrokeWidth(selectedNoteTool, selectedNoteThickness);
     activeStroke = {
       tool: selectedNoteTool,
       color: selectedNoteColor,
-      width: selectedNoteTool === "highlight" ? 14 : 3,
+      width: strokeWidth,
       points: [pt]
     };
     currentNoteStrokes.push(activeStroke);
@@ -665,7 +735,7 @@ function setupVaultDrawing() {
     context.globalCompositeOperation = selectedNoteTool === "eraser" ? "destination-out" : "source-over";
     context.strokeStyle = selectedNoteColor;
     context.globalAlpha = selectedNoteTool === "highlight" ? 0.35 : 1;
-    context.lineWidth = selectedNoteTool === "highlight" ? 14 : 3;
+    context.lineWidth = strokeWidth;
     context.lineCap = "round";
     context.beginPath();
     context.moveTo(pt.x, pt.y);
@@ -685,7 +755,7 @@ function setupVaultDrawing() {
     context.globalCompositeOperation = selectedNoteTool === "eraser" ? "destination-out" : "source-over";
     context.strokeStyle = selectedNoteColor;
     context.globalAlpha = selectedNoteTool === "highlight" ? 0.35 : 1;
-    context.lineWidth = selectedNoteTool === "highlight" ? 14 : 3;
+    context.lineWidth = activeStroke.width || 3;
     context.lineCap = "round";
     context.beginPath();
     context.moveTo(lastPoint.x, lastPoint.y);
@@ -1161,6 +1231,19 @@ document.addEventListener("click", event => {
     return;
   }
 
+  const deleteBtn = event.target.closest(".note-delete-btn");
+  if (deleteBtn) {
+    event.stopPropagation();
+    event.preventDefault();
+    const title = deleteBtn.dataset.noteTitle;
+    if (title) {
+      deleteVaultNote(title);
+      renderVault($("#vaultSearch")?.value || "");
+      showToast(`Note "${title}" deleted.`);
+    }
+    return;
+  }
+
   const vaultCard = event.target.closest(".vault-card");
   if (vaultCard) { openVaultDetails(vaultCard); return; }
 
@@ -1169,7 +1252,19 @@ document.addEventListener("click", event => {
     selectedNoteTool = noteTool.dataset.noteTool;
     $$("[data-note-tool]").forEach(tool => tool.classList.toggle("active", tool.dataset.noteTool === selectedNoteTool));
     updateDrawingMode();
-    showToast(`${selectedNoteTool} note tool selected.`);
+    if (selectedNoteTool === "eraser") {
+      showToast("Eraser selected. Pick thin, med, or thick to erase.");
+    } else {
+      showToast(`${selectedNoteTool.charAt(0).toUpperCase() + selectedNoteTool.slice(1)} tool selected.`);
+    }
+    return;
+  }
+
+  const thicknessBtn = event.target.closest("[data-note-thickness]");
+  if (thicknessBtn) {
+    selectedNoteThickness = thicknessBtn.dataset.noteThickness;
+    $$("[data-note-thickness]").forEach(b => b.classList.toggle("active", b.dataset.noteThickness === selectedNoteThickness));
+    showToast(`Thickness: ${selectedNoteThickness}`);
     return;
   }
 
@@ -1212,7 +1307,7 @@ document.addEventListener("click", event => {
   if (plannerTab) {
     state.plannerView = plannerTab.dataset.plannerView;
     saveState();
-    $$("[data-planner-view]").forEach(tab => tab.classList.toggle("active", tab.dataset.plannerView === plannerTab));
+    $$("[data-planner-view]").forEach(tab => tab.classList.toggle("active", tab === plannerTab));
     $$("#planner-agenda, #planner-calendar, #planner-tasks, #planner-kanban").forEach(panel => panel.classList.add("hidden"));
     $(`#planner-${state.plannerView}`)?.classList.remove("hidden");
     if (state.plannerView === "calendar") renderCalendar();
@@ -1322,6 +1417,22 @@ document.addEventListener("click", event => {
     if (name === "add-task") openModal("#taskModal");
     if (name === "close-modal") closeModal("#taskModal");
     if (name === "close-vault-modal") closeModal("#vaultModal");
+    if (name === "delete-active-vault-note") {
+      if (activeVaultTitle) {
+        const deletedTitle = activeVaultTitle;
+        deleteVaultNote(activeVaultTitle);
+        closeModal("#vaultModal");
+        renderVault($("#vaultSearch")?.value || "");
+        showToast(`Note "${deletedTitle}" deleted.`);
+      }
+      return;
+    }
+    if (name === "reset-vault-default") {
+      resetVaultNotesToDefault();
+      renderVault($("#vaultSearch")?.value || "");
+      showToast("All original default notes restored (Garden notes, Things to learn, etc.).");
+      return;
+    }
     if (name === "add-note") openModal("#noteModal");
     if (name === "close-note-modal") closeModal("#noteModal");
     if (name === "focus-reflection") { switchView("personal"); requestAnimationFrame(() => $("#reflectionText")?.focus()); }
@@ -1429,10 +1540,54 @@ $("#noteForm")?.addEventListener("submit", event => {
   const text = String(form.get("text") || "").trim();
   if (!title || !text) return;
   saveVaultNote({ icon: form.get("icon") || "📝", title, text, meta: "Just added", color: "gold" });
-  renderVault($("#vaultSearch").value); closeModal("#noteModal"); event.target.reset(); showToast("Note added to your Knowledge Vault.");
+  renderVault($("#vaultSearch")?.value || ""); closeModal("#noteModal"); event.target.reset(); showToast("Note added to your Knowledge Vault.");
 });
 
 $("#vaultSearch")?.addEventListener("input", event => renderVault(event.target.value));
+
+/* Sanctuary Personalization on Phone & Desktop */
+function setupSanctuaryPersonalization() {
+  const saveBtn = $("#savePersonalNameBtn");
+  const nameInput = $("#personalGreetingName");
+  if (saveBtn && nameInput) {
+    const handleNameUpdate = () => {
+      const newName = nameInput.value.trim() || "Poppy";
+      state.name = newName;
+      saveState();
+      updateNameUI(newName);
+      showToast(`Greeting updated to ${newName}!`);
+    };
+    saveBtn.addEventListener("click", handleNameUpdate);
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleNameUpdate();
+      }
+    });
+  }
+
+  const mobileToggle = $("#mobileTextComfortToggle");
+  if (mobileToggle) {
+    mobileToggle.checked = Boolean(state.comfortableText);
+    mobileToggle.addEventListener("change", (e) => {
+      applyTextComfort(e.target.checked);
+      showToast(e.target.checked ? "Large comfortable text turned on." : "Standard text restored.");
+    });
+  }
+
+  // Reflection typing & blur continuous autosave
+  const reflectionArea = $("#reflectionText");
+  if (reflectionArea) {
+    reflectionArea.addEventListener("input", () => {
+      autosaveReflection();
+      updateReflectionWordCount();
+    });
+    reflectionArea.addEventListener("blur", () => {
+      autosaveReflection();
+    });
+  }
+}
+setupSanctuaryPersonalization();
 
 /* Sidebar controls */
 const closeSidebar = () => { $("#sidebar").classList.remove("open"); $("#sidebarScrim").classList.remove("open"); };
