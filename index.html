@@ -63,8 +63,7 @@
           <button class="nav-item" data-view="personal"><svg><use href="#i-user"/></svg><span>Personal Space</span></button>
         </nav>
         <div class="sidebar-bottom">
-          <button class="nav-item" data-view="settings"><svg><use href="#i-settings"/></svg><span>Settings & Themes</span></button>
-          <div class="sync-card"><div class="sync-icon"><svg><use href="#i-lock"/></svg></div><div><strong>Private & Offline</strong><span>Works without PC or server</span></div><span class="status-pulse"></span></div>
+          <button class="nav-item" data-view="settings"><svg><use href="#i-settings"/></svg><span>Settings & Themes</span></button><div><strong>Private & Offline</strong><span>Works without PC or server</span></div><span class="status-pulse"></span></div>
           <div class="profile-chip"><div class="avatar avatar-gold"><img src="profile.jpg" alt="Poppy" class="avatar-profile-img" /></div><div><strong>Poppy</strong><span>Personal space</span></div><button class="icon-button subtle" aria-label="Profile menu"><svg><use href="#i-more"/></svg></button></div>
         </div>
         <button class="sidebar-close icon-button" id="sidebarClose" aria-label="Close navigation"><svg><use href="#i-close"/></svg></button>
@@ -105,29 +104,6 @@
         </header>
 
         <div class="page-area">
-          <!-- iOS PWA Home Screen Install Helper Banner -->
-          <div class="ios-install-banner hidden" id="iosInstallBanner">
-            <div class="ios-banner-icon"><svg><use href="#i-share"/></svg></div>
-            <div class="ios-banner-text">
-              <strong>Add Poppy’s App to your iPhone Home Screen</strong>
-              <p>Tap <strong>Share</strong> <svg class="inline-svg"><use href="#i-share"/></svg> in Safari, then choose <strong>‘Add to Home Screen’</strong> to use anytime, even offline!</p>
-            </div>
-            <button class="dismiss-banner" data-action="dismiss-ios-banner" aria-label="Dismiss">×</button>
-          </div>
-
-          <!-- OVERVIEW (DASHBOARD) -->
-          <section class="page-view active" id="view-dashboard">
-            <div class="page-heading dashboard-heading">
-              <div>
-                <p class="eyebrow" id="todayLabel">Today</p>
-                <h1>Good day, Poppy<span class="wave">✦</span></h1>
-                <p class="heading-subtitle">Here’s a calm view of what matters today.</p>
-              </div>
-              <div class="heading-actions">
-                <button class="button button-ghost" data-view-target="planner" data-planner-target="calendar"><svg><use href="#i-calendar"/></svg>View calendar</button>
-                <button class="button button-primary" data-action="add-task"><svg><use href="#i-plus"/></svg>Add task</button>
-              </div>
-            </div>
             <div class="dashboard-grid">
               <article class="card today-card">
                 <div class="card-head">
@@ -247,7 +223,6 @@
             <div class="page-heading">
               <div><p class="eyebrow">A home for what you’ve learned</p><h1>Knowledge Vault</h1><p class="heading-subtitle">Your notes, references, and useful discoveries—kept close.</p></div>
               <div class="vault-heading-actions">
-                <button type="button" class="button button-ghost small" data-action="reset-vault-default" title="Restore original default notes (Garden notes, Things to learn, etc.)">↺ Reset to defaults</button>
                 <button type="button" class="button button-primary" data-action="add-note"><svg><use href="#i-plus"/></svg>New note</button>
               </div>
             </div>
@@ -278,7 +253,6 @@
                 <div class="companion-suggestions" role="group" aria-label="Suggested prompts">
                   <button type="button" class="prompt-chip" data-prompt="Good morning Poppy!">☀️ Morning check-in</button>
                   <button type="button" class="prompt-chip" data-prompt="What is on my plan today?">📋 Today's plan</button>
-                  <button type="button" class="prompt-chip" data-prompt="Please note the task pickup library books finished">✓ Note library books finished</button>
                   <button type="button" class="prompt-chip" data-prompt="Tell me a peaceful short story">📖 Tell me a story</button>
                   <button type="button" class="prompt-chip" data-prompt="Suggest a calming tea for this evening">🍵 Calming tea idea</button>
                   <button type="button" class="prompt-chip" data-prompt="Give me a gardening tip for today">🌱 Gardening tip</button>
@@ -386,8 +360,6 @@
               <div class="settings-nav">
                 <button class="active">Appearance</button>
                 <button>AI companion</button>
-                <button>Privacy & security</button>
-                <button>Offline & App</button>
               </div>
               <div class="settings-content">
                 <article class="settings-section">
@@ -439,17 +411,6 @@
                   </div>
                   <div class="setting-line"><div><strong>Conversational Task Actions</strong><span>Allow companion to mark tasks done or add new tasks via chat</span></div><label class="toggle"><input type="checkbox" checked /><i></i></label></div>
                   <div class="setting-line"><div><strong>Proactive Suggestions</strong><span>Offer gentle ideas for calm afternoons</span></div><label class="toggle"><input type="checkbox" checked /><i></i></label></div>
-                </article>
-
-                <article class="settings-section">
-                  <div class="settings-section-head">
-                    <div><p class="eyebrow">Offline & iPhone</p><h2>Always Available</h2><p>This app is designed to work completely offline even when the computer or server is turned off.</p></div>
-                    <span class="status-pill gold-pill">Offline Ready</span>
-                  </div>
-                  <div class="device-line">
-                    <div class="device-icon">📱</div>
-                    <div><strong>iPhone 13 Home Screen Icon</strong><span>Add to your iPhone Home Screen via Safari for instant full-screen use.</span></div>
-                  </div>
                 </article>
               </div>
             </div>

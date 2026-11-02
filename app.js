@@ -27,11 +27,7 @@ const initialState = {
     rememberAcrossConversations: true,
     proactiveSuggestions: true
   },
-  tasks: [
-    { id: 1, title: "Pick up library books", date: getLocalDateStr(), time: "16:30", list: "progress", done: false, detail: "Historical biographies waiting" },
-    { id: 2, title: "Try Sunday lemon rice recipe", date: getLocalDateStr(), time: "10:00", list: "todo", done: false, detail: "Simple, generous cooking" },
-    { id: 3, title: "Read for twenty minutes", date: getLocalDateStr(), time: "21:00", list: "todo", done: false, detail: "Before evening rest" }
-  ]
+  tasks: []
 };
 
 let state = loadState();
@@ -84,7 +80,13 @@ function loadState() {
       calendarMonth: Number.isInteger(parsed.calendarMonth) ? parsed.calendarMonth : initialState.calendarMonth,
       selectedDate: parsed.selectedDate || initialState.selectedDate,
       settings: { ...initialState.settings, ...(parsed.settings || {}) },
-      tasks: (Array.isArray(parsed.tasks) ? parsed.tasks : [...initialState.tasks]).filter(task => !task.done && task.list !== "done")
+      tasks: (Array.isArray(parsed.tasks) ? parsed.tasks : []).filter(task => {
+        const title = (task.title || "").toLowerCase();
+        return !task.done && task.list !== "done" &&
+               !title.includes("library books") &&
+               !title.includes("lemon rice") &&
+               !title.includes("twenty minutes");
+      })
     };
   }
   catch { return { ...initialState, view: "dashboard" }; }
@@ -276,10 +278,10 @@ function renderTasks() {
   const dashboardTasks = state.tasks.filter(task => task.date === dashboardDate);
   const agendaTasks = state.tasks.filter(task => task.date === agendaDate);
 
-  $("#todayTasks").innerHTML = dashboardTasks.slice(0, 3).map(task => {
+  $("#todayTasks").innerHTML = dashboardTasks.length ? dashboardTasks.slice(0, 3).map(task => {
     const title = escapeHtml(task.title || "Untitled task");
     return `<div class="task-row"><button class="task-check ${task.done ? "done" : ""}" data-task-id="${task.id}" aria-label="Mark ${title} ${task.done ? "open" : "done"}">${task.done ? icons.check : ""}</button><span>${title}</span><span class="task-time">${formatTime(task.time)}</span></div>`;
-  }).join("");
+  }).join("") : '<div class="empty-state">No tasks planned for today.</div>';
 
   $("#agendaList").innerHTML = agendaTasks.length ? agendaTasks.map(task => {
     const title = escapeHtml(task.title || "Untitled task");
@@ -287,10 +289,10 @@ function renderTasks() {
     return `<div class="agenda-item ${task.done ? "done" : ""}"><span class="agenda-time">${formatTime(task.time)}</span><span class="agenda-line"></span><div class="agenda-main"><strong>${title}</strong><span>${detail}</span></div><button class="task-check ${task.done ? "done" : ""}" data-task-id="${task.id}" aria-label="Mark ${title} ${task.done ? "open" : "done"}">${task.done ? icons.check : ""}</button></div>`;
   }).join("") : `<div class="empty-state">Nothing planned for ${escapeHtml(formatDate(agendaDate))}.</div>`;
 
-  $("#fullTaskList").innerHTML = state.tasks.map(task => {
+  $("#fullTaskList").innerHTML = state.tasks.length ? state.tasks.map(task => {
     const title = escapeHtml(task.title || "Untitled task");
     return `<div class="full-task"><button class="task-check ${task.done ? "done" : ""}" data-task-id="${task.id}" aria-label="Mark ${title} ${task.done ? "open" : "done"}">${task.done ? icons.check : ""}</button><div class="full-task-body"><strong>${title}</strong><span>${escapeHtml(formatDate(task.date))} · ${formatTime(task.time)}</span></div><span class="task-tag ${task.list}">${task.list === "progress" ? "In progress" : task.list === "done" ? "Done" : "To do"}</span></div>`;
-  }).join("");
+  }).join("") : '<div class="empty-state">No tasks created yet. Tap <strong>+ New task</strong> to add one.</div>';
 
   $("#taskCount").textContent = `${state.tasks.filter(task => !task.done).length} open · ${state.tasks.length} total`;
 
@@ -306,9 +308,9 @@ function renderTasks() {
 
   const openToday = dashboardTasks.filter(task => !task.done).length;
   const progressTitle = $(".day-progress strong");
-  if (progressTitle) progressTitle.textContent = openToday === 0 ? "All priorities completed" : `${openToday} gentle priorit${openToday === 1 ? "y" : "ies"} left`;
+  if (progressTitle) progressTitle.textContent = dashboardTasks.length === 0 ? "All clear for today" : openToday === 0 ? "All priorities completed" : `${openToday} gentle priorit${openToday === 1 ? "y" : "ies"} left`;
   const progressSubtitle = $(".day-progress p");
-  if (progressSubtitle) progressSubtitle.textContent = openToday === 0 ? "Time to rest and enjoy the quiet evening." : "One thing at a time is plenty.";
+  if (progressSubtitle) progressSubtitle.textContent = dashboardTasks.length === 0 ? "Enjoy your peaceful, clear day." : openToday === 0 ? "Time to rest and enjoy the quiet evening." : "One thing at a time is plenty.";
 
   const completed = state.tasks.filter(task => task.done).length;
   const percent = state.tasks.length ? Math.round((completed / state.tasks.length) * 100) : 0;
@@ -413,26 +415,23 @@ function renderCalendar() {
   }
 }
 
-const defaultVaultNotes = [
-  { icon: "🌱", title: "The Lemon Verbena & Mint", text: "Thriving well by the sunny kitchen window. Fresh mint and lemon verbena love morning sun.", meta: "Keepsake · Cherished memory", color: "green" },
-  { icon: "🍋", title: "Sunday Lemon Rice", text: "Arjun's recipe with mustard seeds and curry leaves. Gently temper mustard seeds, roasted cashews, and fresh curry leaves in ghee before folding into fluffy rice.", meta: "Keepsake · Family recipe", color: "gold" },
-  { icon: "📷", title: "Old Family Photo Album", text: "Ria found the 1988 summer trip snapshots. Warm laughter, sunny days, and cherished memories.", meta: "Keepsake · Photo memory", color: "blue" },
-  { icon: "🌱", title: "Garden notes", text: "Planting ideas, seasonal reminders, and the things that are thriving.", meta: "12 notes", color: "green" },
-  { icon: "📖", title: "Recipes to keep", text: "Simple, generous food for Sundays and the people around the table.", meta: "8 notes", color: "gold" },
-  { icon: "🗺️", title: "Places to go", text: "Small trips, long weekends, and places worth taking your time in.", meta: "5 notes", color: "blue" },
-  { icon: "💡", title: "Things to learn", text: "Questions, references, and rabbit holes for a curious afternoon.", meta: "21 notes", color: "rose" },
-  { icon: "🏡", title: "Home projects", text: "Practical ideas for making the house a little more yours.", meta: "9 notes", color: "gold" },
-  { icon: "✍️", title: "Saved thoughts", text: "Calm ideas, reflections, and reminders ready whenever you need them.", meta: "4 notes", color: "blue" }
-];
+const defaultVaultNotes = [];
 
 function getVaultStoredNotes() {
   try {
     const raw = localStorage.getItem("hearth-harbor-vault-notes");
-    if (raw) return JSON.parse(raw);
-    localStorage.setItem("hearth-harbor-vault-notes", JSON.stringify(defaultVaultNotes));
-    return [...defaultVaultNotes];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const demoTitles = [
+        "the lemon verbena & mint", "sunday lemon rice", "old family photo album",
+        "garden notes", "recipes to keep", "places to go", "things to learn",
+        "home projects", "saved thoughts"
+      ];
+      return parsed.filter(n => !demoTitles.includes((n.title || "").toLowerCase().trim()));
+    }
+    return [];
   } catch {
-    return [...defaultVaultNotes];
+    return [];
   }
 }
 
@@ -824,13 +823,7 @@ function openVaultNoteDirect(title, text, meta = "Keepsake · Cherished memory")
 /* ========================================================
    BUILT-IN AI COMPANION CHATBOT ENGINE (FOR POPPY)
    ======================================================== */
-const defaultCompanionHistory = [
-  {
-    role: "assistant",
-    text: "Good day, Poppy! ✦ I’m your private built-in companion. You can chat with me about anything — ask for stories, recipes, gardening tips, or ask me to manage your day, like:\n\n• “Please note the task pickup library books finished”\n• “What’s on my plan today?”\n• “Tell me a calm story”\n• “Suggest a soothing tea recipe”\n\nHow can I help you right now, Poppy?",
-    time: "Just now"
-  }
-];
+const defaultCompanionHistory = [];
 
 function loadCompanionHistory() {
   try {
@@ -860,6 +853,15 @@ let companionHistory = loadCompanionHistory();
 function renderCompanionChat() {
   const container = $("#companionMessages");
   if (!container) return;
+  if (!companionHistory || companionHistory.length === 0) {
+    container.innerHTML = `
+      <div class="companion-empty-chat" style="text-align:center; padding:38px 20px; color:var(--muted); font-size:13px;">
+        <div style="font-size:32px; margin-bottom:10px;">✨</div>
+        <strong style="display:block; color:#f0f4fc; font-size:15px; margin-bottom:6px;">How can I help you today, Poppy?</strong>
+        <span>Ask anything, request a calm thought, or tell me to add a task to your planner.</span>
+      </div>`;
+    return;
+  }
   container.innerHTML = companionHistory.map(msg => {
     const isUser = msg.role === "user";
     const avatar = isUser ? '<img src="profile.jpg" alt="Poppy" class="chat-avatar-img" />' : "✦";
