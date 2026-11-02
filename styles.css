@@ -20,8 +20,28 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; background: var(--navy); }
-body { color: var(--ink); font-size: 14px; line-height: 1.45; }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  background: var(--navy);
+  -webkit-text-size-adjust: 100%;
+}
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+}
+main.main-content {
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
+  overflow-x: hidden !important;
+}
 button, input, textarea, select { font: inherit; color: inherit; }
 button { border: 0; cursor: pointer; }
 
@@ -76,7 +96,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .breadcrumbs { display: flex; align-items: center; gap: 9px; color: var(--muted-2); font-size: 12px; }.breadcrumbs strong { color: #d3d4d4; font-weight: 500; }.breadcrumbs span:nth-child(2) { color: #4e555b; }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }.topbar-user strong, .topbar-user span { display: block; text-align: right; }.topbar-user strong { font-size: 12px; font-weight: 600; }.topbar-user span { font-size: 10px; color: var(--muted-2); margin-top: 2px; }.topbar-divider { width: 1px; height: 25px; background: var(--line); margin: 0 3px; }
 .icon-button { background: transparent; color: var(--muted); display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; }.icon-button:hover { color: var(--ink); background: rgba(255,255,255,.07); }.icon-button.subtle { color: #6c757d; }.notification-button { position: relative; }.notification-button span { position: absolute; right: 6px; top: 6px; width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }.mobile-menu { display: none; }
-.avatar { flex: 0 0 auto; width: 31px; height: 31px; display: grid; place-items: center; border-radius: 50%; font-size: 11px; font-weight: 700; }.avatar-gold { background: linear-gradient(145deg, #a5793e, #e0bc7c); color: #261e12; }.avatar-rose { background: #71454a; color: #f4c4bf; }.avatar-blue { background: #33566a; color: #bde5f6; }.avatar-green { background: #31564a; color: #b5ebcc; }
+.avatar { flex: 0 0 auto; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; overflow: hidden; border: 1.5px solid var(--gold); box-shadow: 0 0 12px rgba(226,168,74,.4); }.avatar-profile-img, .chat-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }.avatar-gold { background: #121828; color: var(--gold-light); }
 .page-area { padding: 39px 48px 72px; max-width: 1440px; margin: 0 auto; }.page-view { display: none; animation: pageIn .3s ease; }.page-view.active { display: block; } @keyframes pageIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 31px; }.page-heading h1 { margin: 7px 0 7px; font: 400 clamp(29px, 3vw, 40px)/1.1 Georgia, serif; letter-spacing: -.8px; }.heading-subtitle { margin: 0; color: var(--muted); font-size: 13px; }.eyebrow { color: var(--muted-2); text-transform: uppercase; letter-spacing: 1.6px; font-size: 10px; font-weight: 700; margin: 0; }.eyebrow.gold { color: var(--gold); }.wave { color: var(--gold); font: 22px sans-serif; margin-left: 8px; vertical-align: 4px; }.button { border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; font-size: 12px; font-weight: 650; white-space: nowrap; transition: .2s ease; }.button svg { width: 15px; height: 15px; }.button-primary { background: #e7e4dc; color: #172029; }.button-primary:hover { background: #fff; transform: translateY(-1px); }.button-gold { background: var(--gold); color: #251d10; }.button-gold:hover { background: var(--gold-light); transform: translateY(-1px); }.button-ghost { background: rgba(255,255,255,.04); color: #c9ccce; border: 1px solid var(--line-strong); }.button-ghost:hover { background: rgba(255,255,255,.09); }.full-width { width: 100%; }
 .birthday-banner { display: flex; align-items: center; gap: 13px; min-height: 58px; padding: 10px 16px; border: 1px solid rgba(212,170,102,.22); background: linear-gradient(90deg, rgba(212,170,102,.09), rgba(212,170,102,.025)); border-radius: 9px; margin-bottom: 22px; }.birthday-glyph { color: var(--gold); font-size: 25px; line-height: 1; }.birthday-banner strong { font: 15px Georgia, serif; }.birthday-banner p { margin: 2px 0 0; color: #9e9b91; font-size: 11px; }.text-button { background: transparent; color: var(--gold-light); display: inline-flex; align-items: center; gap: 7px; padding: 4px; font-size: 11px; margin-left: auto; }.text-button:hover { color: #fff; }.text-button svg { width: 14px; height: 14px; }.text-button.small { font-size: 11px; }.dismiss-banner { color: #7f7565; background: transparent; font-size: 19px; padding: 5px; margin-left: 4px; }
@@ -620,32 +640,76 @@ body {
     padding: 10px !important;
   }
 
-  /* Compact Topbar actions for 390px */
+  /* Perfect Fit for iPhone 13 (390px Viewport) */
+  .topbar {
+    height: 52px !important;
+    padding: 0 12px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+  .breadcrumbs {
+    font-size: 13px !important;
+    margin-right: auto !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 130px !important;
+  }
+  .breadcrumbs span {
+    display: none !important;
+  }
+  .breadcrumbs strong {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
   .topbar-actions {
     gap: 6px !important;
+    flex-shrink: 0 !important;
   }
-  .theme-palette-picker {
-    padding: 2px 4px !important;
-    gap: 4px !important;
-  }
-  .color-swatch-btn {
-    width: 14px !important;
-    height: 14px !important;
+  /* Hide heavy topbar items on mobile so they don't cause overflow */
+  .theme-palette-picker,
+  .topbar-divider,
+  .topbar-user,
+  .notification-button {
+    display: none !important;
   }
   .undo-redo-pill {
-    padding: 3px 6px !important;
-    font-size: 11px !important;
-    gap: 3px !important;
+    padding: 6px 9px !important;
+  }
+  .undo-redo-pill span {
+    display: none !important; /* Icons only on mobile! */
   }
   .undo-redo-pill svg {
-    width: 13px !important;
-    height: 13px !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+    flex-shrink: 0 !important;
+  }
+  .card, .today-card, .assistant-card, .wisdom-card {
+    position: relative !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .assistant-orb {
+    right: -10px !important;
+    top: -12px !important;
+    width: 66px !important;
+    height: 66px !important;
   }
 
   /* Compact View for Poppy — No Need to Scroll Excessively */
   .page-area {
     padding-top: 10px !important;
     padding-bottom: 84px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
   .page-heading {
     margin-bottom: 12px !important;
@@ -676,8 +740,12 @@ body {
   }
   .companion-compose-bar {
     padding: 8px 10px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .companion-compose-bar input {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
     padding: 8px 10px !important;
     font-size: 14px !important;
   }

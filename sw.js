@@ -1,10 +1,11 @@
-const CACHE_NAME = "hearth-harbor-v3";
+const CACHE_NAME = "hearth-harbor-v4";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.json",
+  "./profile.jpg",
   "./apple-touch-icon.png",
   "./icon-192.png",
   "./icon-512.png"

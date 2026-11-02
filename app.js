@@ -478,7 +478,11 @@ function updateNameUI(name) {
   if (topbarGreeting) topbarGreeting.textContent = greeting;
   const profileChip = $(".profile-chip strong");
   if (profileChip) profileChip.textContent = displayName;
-  $$(".avatar-gold").forEach(av => av.textContent = displayName.slice(0, 1).toUpperCase());
+  $$(".avatar-gold").forEach(av => {
+    if (!av.querySelector("img")) {
+      av.innerHTML = '<img src="profile.jpg" alt="Poppy" class="avatar-profile-img" />';
+    }
+  });
 }
 
 function updateAgendaDate(offset) {
@@ -763,7 +767,7 @@ function renderCompanionChat() {
   if (!container) return;
   container.innerHTML = companionHistory.map(msg => {
     const isUser = msg.role === "user";
-    const avatar = isUser ? "P" : "✦";
+    const avatar = isUser ? '<img src="profile.jpg" alt="Poppy" class="chat-avatar-img" />' : "✦";
     const textHtml = escapeHtml(msg.text).replace(/\n/g, "<br>");
     const taskDoneHtml = msg.taskDone ? `<div class="task-pill-done"><svg><use href="#i-check"/></svg> ${escapeHtml(msg.taskDone)}</div>` : "";
     return `
@@ -834,21 +838,21 @@ function handleCompanionInput(userText) {
 
       if (matchedTask && highestScore > 0) {
         pushHistory();
-        matchedTask.done = true;
-        matchedTask.list = "done";
+        const finishedTitle = matchedTask.title;
+        state.tasks = state.tasks.filter(t => t.id !== matchedTask.id);
         saveState();
         renderTasks();
         renderCalendar();
 
         companionHistory.push({
           role: "assistant",
-          text: `Done, Poppy! ✦ I’ve marked “${matchedTask.title}” as finished in your planner. Take some time to sit back and relax!`,
-          taskDone: `Completed: ${matchedTask.title}`,
+          text: `Done, Poppy! ✦ I’ve marked “${finishedTitle}” as finished and cleared it from your planner. Take some time to sit back and relax!`,
+          taskDone: `Completed & Cleared: ${finishedTitle}`,
           time: "Just now"
         });
         saveCompanionHistory(companionHistory);
         renderCompanionChat();
-        showToast(`“${matchedTask.title}” marked finished.`);
+        showToast(`“${finishedTitle}” finished & cleared.`);
         return;
       }
     }
@@ -1238,14 +1242,15 @@ document.addEventListener("click", event => {
 
   const task = event.target.closest("[data-task-id]");
   if (task) {
-    const item = state.tasks.find(entry => entry.id === Number(task.dataset.taskId));
+    const taskId = Number(task.dataset.taskId);
+    const item = state.tasks.find(entry => entry.id === taskId);
     if (item) {
       pushHistory();
-      item.done = !item.done;
-      if (item.done) item.list = "done";
-      else if (item.list === "done") item.list = "todo";
+      state.tasks = state.tasks.filter(entry => entry.id !== taskId);
       saveState();
       renderTasks();
+      renderCalendar();
+      showToast(`“${item.title}” finished & cleared. ✦`);
     }
     return;
   }

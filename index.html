@@ -64,7 +64,7 @@
         <div class="sidebar-bottom">
           <button class="nav-item" data-view="settings"><svg><use href="#i-settings"/></svg><span>Settings & Themes</span></button>
           <div class="sync-card"><div class="sync-icon"><svg><use href="#i-lock"/></svg></div><div><strong>Private & Offline</strong><span>Works without PC or server</span></div><span class="status-pulse"></span></div>
-          <div class="profile-chip"><div class="avatar avatar-gold">P</div><div><strong>Poppy</strong><span>Personal space</span></div><button class="icon-button subtle" aria-label="Profile menu"><svg><use href="#i-more"/></svg></button></div>
+          <div class="profile-chip"><div class="avatar avatar-gold"><img src="profile.jpg" alt="Poppy" class="avatar-profile-img" /></div><div><strong>Poppy</strong><span>Personal space</span></div><button class="icon-button subtle" aria-label="Profile menu"><svg><use href="#i-more"/></svg></button></div>
         </div>
         <button class="sidebar-close icon-button" id="sidebarClose" aria-label="Close navigation"><svg><use href="#i-close"/></svg></button>
       </aside>
@@ -98,7 +98,7 @@
             </div>
             <button class="icon-button notification-button" data-action="show-notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span></span></button>
             <div class="topbar-divider"></div>
-            <div class="avatar avatar-gold">P</div>
+            <div class="avatar avatar-gold"><img src="profile.jpg" alt="Poppy" class="avatar-profile-img" /></div>
             <div class="topbar-user"><strong>Poppy</strong><span>Good day</span></div>
           </div>
         </header>
@@ -127,15 +127,6 @@
                 <button class="button button-primary" data-action="add-task"><svg><use href="#i-plus"/></svg>Add task</button>
               </div>
             </div>
-            <div class="birthday-banner">
-              <div class="birthday-glyph">✺</div>
-              <div>
-                <strong>A thoughtful gift, designed for Poppy.</strong>
-                <p>A quiet personal sanctuary for your daily plans, calendar, and peaceful moments. Crafted with love.</p>
-              </div>
-              <button class="text-button" data-action="open-welcome">Personalize space <svg><use href="#i-arrow"/></svg></button>
-              <button class="dismiss-banner" data-action="dismiss-banner" aria-label="Dismiss">×</button>
-            </div>
             <div class="dashboard-grid">
               <article class="card today-card">
                 <div class="card-head">
@@ -143,8 +134,8 @@
                   <button class="icon-button subtle" data-view-target="planner" aria-label="Open planner"><svg><use href="#i-arrow"/></svg></button>
                 </div>
                 <div class="day-progress">
-                  <div class="progress-ring"><span id="progressPercent">60%</span></div>
-                  <div><strong>Gentle priorities</strong><p>One thing at a time is plenty.</p></div>
+                  <div class="progress-ring"><span id="progressPercent">0%</span></div>
+                  <div><strong>Active priorities</strong><p>One gentle step at a time.</p></div>
                 </div>
                 <div class="task-preview-list" id="todayTasks"></div>
                 <div class="card-actions-row">
@@ -159,7 +150,7 @@
                   <div><p class="eyebrow gold">Your companion</p><h2>One thoughtful suggestion</h2></div>
                   <span class="status-pill">Ready</span>
                 </div>
-                <p class="assistant-copy">“You have a clear afternoon. Shall I set aside an hour for your garden project and keep dinner easy?”</p>
+                <p class="assistant-copy">“You have a clear afternoon, Poppy. Shall I set aside time for a peaceful walk or your garden?”</p>
                 <div class="assistant-actions">
                   <button class="button button-gold" data-action="approve-suggestion">Make it so</button>
                   <button class="button button-ghost" data-view-target="assistant">Chat with companion →</button>
@@ -174,7 +165,7 @@
                   <span class="status-pill gold-pill">Fresh thought</span>
                 </div>
                 <blockquote class="wisdom-quote" id="wisdomQuoteText">
-                  “A father’s wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned.”
+                  “A father’s wisdom is a quiet lamp that lights every road ahead. Take time today to pause, breathe, and enjoy the moments you’ve earned, Poppy.”
                 </blockquote>
                 <div class="wisdom-footer">
                   <span class="wisdom-author" id="wisdomAuthor">— Dedicated with love</span>
@@ -183,23 +174,6 @@
                     <button class="button button-ghost small" data-view-target="personal">Write reflection →</button>
                   </div>
                 </div>
-              </article>
-
-              <article class="card progress-card">
-                <div class="card-head">
-                  <div><p class="eyebrow">A little momentum</p><h2>Your week at a glance</h2></div>
-                  <button class="icon-button subtle" data-action="toast" data-toast="Your weekly rhythm is looking balanced."><svg><use href="#i-more"/></svg></button>
-                </div>
-                <div class="week-bars">
-                  <div class="bar-col"><span>Mon</span><div class="bar"><i style="height:64%"></i></div></div>
-                  <div class="bar-col"><span>Tue</span><div class="bar"><i style="height:82%"></i></div></div>
-                  <div class="bar-col"><span>Wed</span><div class="bar"><i style="height:48%"></i></div></div>
-                  <div class="bar-col"><span>Thu</span><div class="bar"><i style="height:70%"></i></div></div>
-                  <div class="bar-col current"><span>Fri</span><div class="bar"><i style="height:58%"></i></div></div>
-                  <div class="bar-col"><span>Sat</span><div class="bar"><i style="height:90%"></i></div></div>
-                  <div class="bar-col"><span>Sun</span><div class="bar"><i style="height:40%"></i></div></div>
-                </div>
-                <div class="progress-footer"><span><i class="legend-dot"></i> Completed tasks</span><strong>18 this week</strong></div>
               </article>
             </div>
           </section>
