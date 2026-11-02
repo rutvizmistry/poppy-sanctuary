@@ -201,12 +201,22 @@ body { background: var(--navy); }
 .vault-detail-modal .permission-note { margin-top: 12px; }
 
 /* Responsive Modal Styling — Fixes 'Cannot exit or scroll down' on mobile */
+.modal-backdrop.hidden,
+.note-backdrop.hidden,
+.vault-backdrop.hidden,
+.modal.hidden,
+.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
 .note-backdrop, .vault-backdrop, .modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 9999 !important;
-  display: block !important;
-  background: rgba(2, 6, 15, .88) !important;
+  display: block;
+  background: rgba(2, 6, 15, .88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: max(14px, env(safe-area-inset-top, 14px)) 12px max(30px, env(safe-area-inset-bottom, 30px)) 12px !important;

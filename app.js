@@ -1106,13 +1106,22 @@ function handleCompanionInput(userText) {
    MODALS, AUTOSAVE & PERSISTENCE
    ======================================================== */
 function openModal(id) {
-  $(id).classList.remove("hidden");
+  const el = $(id);
+  if (!el) return;
+  el.classList.remove("hidden");
+  el.style.display = "block";
   if (id === "#taskModal" && $("#taskModalDate")) {
     $("#taskModalDate").value = state.plannerDate || getLocalDateStr();
   }
-  setTimeout(() => $(id).querySelector("input, textarea, select, button:not(.modal-close), [tabindex]")?.focus(), 30);
+  setTimeout(() => el.querySelector("input, textarea, select, button:not(.modal-close), [tabindex]")?.focus(), 30);
 }
-function closeModal(id) { $(id).classList.add("hidden"); }
+function closeModal(id) {
+  const el = $(id);
+  if (el) {
+    el.classList.add("hidden");
+    el.style.display = "none";
+  }
+}
 
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[character])); }
 
@@ -1463,7 +1472,10 @@ document.addEventListener("click", event => {
     if (name === "toast") showToast(action.dataset.toast || "This action is ready.");
     return;
   }
-  if (event.target.classList.contains("modal-backdrop")) event.target.classList.add("hidden");
+  if (event.target.classList.contains("modal-backdrop")) {
+    event.target.classList.add("hidden");
+    event.target.style.display = "none";
+  }
 });
 
 // Vault detail textarea typing autosave
@@ -1662,7 +1674,15 @@ if ($("#reflectionText")) {
   updateReflectionWordCount();
 }
 
+// Ensure all modals are closed initially
+$$(".modal-backdrop").forEach(m => {
+  m.classList.add("hidden");
+  m.style.display = "none";
+});
+
 // Always start on Overview and rotate wisdom quote
+state.view = "dashboard";
+saveState();
 switchView("dashboard");
 renderTasks();
 renderVault();
